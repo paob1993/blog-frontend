@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-navbar class="p-4" type="dark" variant="dark">
-      <b-navbar-brand to="/">Paola Blog 😊</b-navbar-brand>
+      <b-navbar-brand to="/">PaoB Blog 😊</b-navbar-brand>
       <b-navbar-nav class="navbar-collapse justify-content-end">
         <div v-if="!username" class="d-flex">
           <b-nav-item to="/publications">Blog</b-nav-item>
