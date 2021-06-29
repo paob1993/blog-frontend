@@ -55,7 +55,7 @@ export default {
       PublicationServices.get(id)
         .then((response) => {
           this.publication = response.data.publication;
-          if (localStorage.getItem("role") != 1) {
+          if (localStorage.getItem("role") && localStorage.getItem("role") != 1) {
             this.addVisit(this.$route.params.id);
           }
         })
