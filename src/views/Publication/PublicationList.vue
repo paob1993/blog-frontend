@@ -14,7 +14,7 @@
     <b-table
       :items="publications"
       :fields="fields"
-      :per-page="perPage"
+      :per-page="0"
       :current-page="currentPage"
       striped
       responsive="sm"
@@ -34,6 +34,8 @@
           <b-icon variant="dark" icon="eye" font-scale="1"></b-icon>
         </b-button>
         <b-button
+          @click="patchValues(row.item)"
+          v-b-modal.modal-prevent-closing
           size="sm"
           class="m-1"
           variant="light"
@@ -58,8 +60,9 @@
       align="center"
       pills
       v-model="currentPage"
-      :total-rows="rows"
+      :total-rows="total"
       :per-page="perPage"
+      @change="changePage($event)"
     ></b-pagination>
 
     <div>
@@ -69,7 +72,6 @@
         ref="modal"
         title="Crear Publicacion"
         centered
-        @show="resetModal"
         @hidden="resetModal"
         @ok="handleOk"
       >
@@ -138,6 +140,12 @@ export default {
   },
   data() {
     return {
+      form: {
+        title: "",
+        content: "",
+        image: "",
+        author: "",
+      },
       fields: [
         { key: "title", label: "Título" },
         { key: "publish_date", label: "Publicación" },
@@ -148,12 +156,6 @@ export default {
       currentPage: 1,
       total: 0,
       publications: [],
-      form: {
-        title: "",
-        content: "",
-        image: "",
-        author: "",
-      },
       base64Image: null,
       fileImage: null,
       titleState: null,
@@ -161,6 +163,8 @@ export default {
       show: 0,
       title: "",
       variant: "",
+      isEdit: false,
+      publicationId: null,
     };
   },
   methods: {
@@ -188,7 +192,15 @@ export default {
       if (!this.checkFormValidity()) {
         return;
       }
-      this.imageToBase64(this.fileImage);
+      if (this.fileImage) {
+        this.imageToBase64(this.fileImage);
+      } else {
+        if (this.isEdit) {
+          this.editPublication();
+        } else {
+          this.savePublication();
+        }
+      }
       this.$nextTick(() => {
         this.$bvModal.hide("modal-prevent-closing");
       });
@@ -199,7 +211,11 @@ export default {
       reader.onload = () => {
         this.form.image = reader.result;
         this.show = 0;
-        this.savePublication();
+        if (this.isEdit) {
+          this.editPublication();
+        } else {
+          this.savePublication();
+        }
       };
       reader.onerror = function (e) {
         console.log("Error: ", e);
@@ -231,6 +247,21 @@ export default {
           console.log(e);
         });
     },
+    editPublication() {
+      PublicationServices.update(this.publicationId, this.form)
+        .then(() => {
+          this.show = 5;
+          this.title = "Publicacion editada con exito";
+          this.variant = "success";
+          this.getPublications();
+        })
+        .catch((e) => {
+          this.show = 5;
+          this.title = "Error al editar el elemento";
+          this.variant = "danger";
+          console.log(e);
+        });
+    },
     deletePublication(id) {
       this.show = 0;
       PublicationServices.delete(id)
@@ -247,10 +278,24 @@ export default {
           console.log(e);
         });
     },
+    patchValues(publication) {
+      this.form = {
+        title: publication.title,
+        author: publication.author,
+        content: publication.content,
+        image: publication.image
+      };
+      this.publicationId = publication.id;
+      this.isEdit = true;
+    },
     session() {
       if (localStorage.getItem("role") != 1) {
         this.$router.push({ name: "publications" });
       }
+    },
+    changePage(page) {
+      this.currentPage = page;
+      this.getPublications();
     },
   },
   computed: {

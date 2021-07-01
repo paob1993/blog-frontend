@@ -4,7 +4,7 @@
     <div v-if="publications.length > 0" class="m-3">
       <h2 class="text-center">Publicaciones</h2>
       <div v-for="publication in publications" :key="publication.src">
-        <b-container class="mt-5" fluid="sm">
+        <b-container class="mt-4" fluid="sm">
           <b-card no-body border-variant="secondary">
             <b-row no-gutters>
               <b-col md="4">
@@ -22,14 +22,12 @@
               <b-col md="8">
                 <b-card-body v-bind:title="publication.title">
                   <b-card-text>
-                    {{ publication.content.slice(0, 100) }}
-                    {{ publication.content.length > 100 ? "[...]" : "" }}
+                    {{ publication.content.slice(0, 200) }}
+                    {{ publication.content.length > 200 ? "[...]" : "" }}
                   </b-card-text>
-                  <b-button
-                    :to="'/publication/details/' + publication.id"
-                    variant="primary"
-                    >Leer más</b-button
-                  >
+                  <b-button :to="'/publication/details/' + publication.id" variant="primary">
+                    Leer más
+                  </b-button>
                 </b-card-body>
               </b-col>
             </b-row>

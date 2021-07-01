@@ -18,7 +18,7 @@ function create(data) {
 }
 
 function update(id, data) {
-    return http.put(`/publication/${id}`, data, {
+    return http.put(`/publications/${id}`, data, {
         headers: {
             "Content-type": "application/json",
             Authorization: 'Bearer ' + localStorage.getItem("token")
@@ -35,12 +35,22 @@ function deletePublication(id) {
     });
 }
 
+function getNext(id) {
+    return http.get(`/publications/next/${id}`);
+}
+
+function getPrevious(id) {
+    return http.get(`/publications/previous/${id}`);
+}
+
 const PublicationServices = Object.freeze({
     getAll,
     get,
     create,
     update,
-    delete: deletePublication
+    delete: deletePublication,
+    getNext,
+    getPrevious
 });
 
 export default PublicationServices;
